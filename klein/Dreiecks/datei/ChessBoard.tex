@@ -1,0 +1,8 @@
+\documentclass[tikz]{standalone}
+\begin{document}
+\begin{tikzpicture}[x=2cm,y=2cm]
+\foreach \y in {0,2,...,3}{
+    \foreach \x in {0,2,...,4}{
+        \fill (\x,\y) rectangle (1+\x,1+\y) rectangle (2+\x,2+\y);}}
+\end{tikzpicture}
+\end{document}
