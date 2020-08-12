@@ -3,28 +3,29 @@ import almath
 import qi
 import cv2 as cv
 from matplotlib import pyplot as plt
+import math
+from simple_pid import PID
 
-session = qi.session()
-session.connect(""tcp://10.0.158.231:9559"")
 # 0 ist obere Kamera
 CamId = 0
-# 3 ist k4VGA,2 ist VGA
-Res = 3
+# 3 ist k4VGA,2 ist VGA,1 kQVGA
+Res = 1
 #BGR-13, YUV422-9
 ColorSpace = 13
 # FPS
 fps = 30
 
 
+
 def Kamera_Vorbrereiten():
     video_cam_service = session.service("ALVideoDevice")
     global.nameId_Cam = video_cam_service.subscribeCamera("Kamera_Get", CamId, Res, ColorSpace, fps)
-    video_cam_service.setParameter(CamId,43,30)
+    effector = 43 # Foucs
+    video_cam_service.setParameter(CamId,effector,30)
     return video_cam_service
 
 def get_raw(video_cam_service):
-    raw_datei = video_cam_service.getImageRemote(nameId_Cam)
-    return raw_datei
+    return video_cam_service.getImageRemote(nameId_Cam)
 
 
 def image_array(raw_datei):
@@ -71,7 +72,7 @@ def MittelPunkt_folgen(image):
         cv.circle(image_rgb, (points[0][0], start_height), 2, (255,0,0), -1) # zeichnen rechte grenze
         cv.circle(image_rgb, (points[0][1], start_height), 2, (255,0,0), -1)
         cv.circle(image_rgb, (middle, start_height), 2, (0,0,255), -1)
-        exzentierung = middle - h/2
+        exzentierung = middle - w/2
         print exzentierung
         Move(exzentierung)
     else:
@@ -80,17 +81,47 @@ def MittelPunkt_folgen(image):
         no_points_count += 1
         Speed -= 0.01
         if Speed <= 0:
+            StopAll()
             break
-    return middle
+    return middle, image_rgb
 
-def Move(motion_service, exzentierung):
+
+def Move(exzentierung):
     x_Speed = 0.08
     y_Speed = 0
-    
+    kp = 0.5
+    ki = 0.0
+    kd = 0.0
+    count = 
 
+    pid = PID(kp,ki,kd, setpoint=0.)
+    if firsttime:
+        pid.id.output_limits = (-1., 1.)
+
+    rot = (math.pi/4) * pid(exzentierung)
+    # rot = kp * (math.pi / 4) * (-exzentierung * 2/ w)
+    motion_service.move(x_Speed, y_Speed, rot)
+
+
+def StopAll():
+    motion_service.stopMove()
+    motion_service.rest()
     
 
 
 if __name__ == "__main__":
     session = qi.session()
     session.connect(""tcp://10.0.158.231:9559"")
+    motion_service = session.service("ALMotion")
+    video_cam_service = Kamera_Vorbrereiten()
+    while True:
+        raw = get_raw()
+        image_array_bgr = image_array(raw)
+        middle, image_rgb = MittelPunkt_folgen(image_array_bgr)
+        cv.imshow("Linie_Folgen", image_rgb)
+        k = cv.waitKey(0)
+        if k == ord("q"):
+            cv.destroyAllWindows()
+            StopAll()
+            break
+        time.sleep(1)
