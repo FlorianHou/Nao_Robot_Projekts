@@ -71,7 +71,9 @@ def MittelPunkt_folgen(image):
         cv.circle(image_rgb, (points[0][0], start_height), 2, (255,0,0), -1) # zeichnen rechte grenze
         cv.circle(image_rgb, (points[0][1], start_height), 2, (255,0,0), -1)
         cv.circle(image_rgb, (middle, start_height), 2, (0,0,255), -1)
-        print(int(middle- h/2))
+        exzentierung = middle - h/2
+        print exzentierung
+        Move(exzentierung)
     else:
         start_height -= 5
         start_height = start_height % h
@@ -81,7 +83,11 @@ def MittelPunkt_folgen(image):
             break
     return middle
 
-def
+def Move(motion_service, exzentierung):
+    x_Speed = 0.08
+    y_Speed = 0
+    
+
     
 
 
