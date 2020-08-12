@@ -5,7 +5,7 @@ import math
 
 k_dict = {}
 
-img = cv.imread("./klein/Dreiecks/datei/031.png")
+img = cv.imread("./klein/Dreiecks/datei/011.png")
 ##Blur
 # img = cv.GaussianBlur(img, (5,5), 0)
 img = cv.bilateralFilter(img, 9, 75, 75)
@@ -47,7 +47,7 @@ x = int((k_dict[1][5] - k_dict[0][5]) / (k_dict[0][4] - k_dict[1][4]))
 y = int(k_dict[1][4] * x + k_dict[1][5])
 p3 = (x, y)
 ##Zeichnen auf dem Bild
-# print(p1, p2, p3)
+print("Schnittpunktrn:",p1, p2, p3)
 cv.circle(img, p1, 10, (255, 0, 0), -1)
 cv.circle(img, p2, 10, (255, 0, 0), -1)
 cv.circle(img, p3, 10, (255, 0, 0), -1)

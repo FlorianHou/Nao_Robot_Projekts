@@ -14,14 +14,12 @@ def draw(img, corners, imgpts):
     return img
 
 
-objp = np.array([[0, 0, 0], [16.43, 0, 0], [0, 19.69, 0], [16.43, 19.69, 0]],
-                np.float32)
-axis = np.float32([[3, 0, 0], [0, 3, 0], [0, 0, -3]]).reshape(-1, 3)
+objp = np.array([[0,98,0], [70, 0, 0], [14, 98, 0]], np.float32)
+axis = np.float32([[30, 0, 0], [0, 30, 0], [0, 0, -30]]).reshape(-1, 3)
 
-img = cv.imread("./klein/PnP_Slover/datei/gray.png")
+img = cv.imread("./klein/Dreiecks/datei/011.png")
 gray = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
-corners2 = np.array([[415, 344], [695, 333], [426, 664], [684, 678]],
-                    np.float32)
+corners2 = np.array([[548, 516], [660, 368], [769, 523]], np.float32)
 
 ret, rvecs, tvecs = cv.solvePnP(objp, corners2, mtx, dist)
 imgpts, jac = cv.projectPoints(axis, rvecs, tvecs, mtx, dist)
