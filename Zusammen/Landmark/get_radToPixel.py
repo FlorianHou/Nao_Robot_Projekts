@@ -48,7 +48,7 @@ class LandMarksToPixel():
             for mark_info in MarkInfo:
                 alpha = mark_info[0][1]
                 beta = mark_info[0][2]
-                heading  = mark_info[0][5]
+                heading = mark_info[0][5]
                 id = mark_info[1]
                 self.mark_dict[id] = (alpha, beta)
 
