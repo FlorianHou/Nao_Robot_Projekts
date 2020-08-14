@@ -78,12 +78,11 @@ def MittelPunkt_folgen(image):
         Move(exzentierung)
     else:
         start_height -= 5
-        start_height = start_height % h
+	    start_height = start_height % h
+        global no_points_count
         no_points_count += 1
-        Speed -= 0.01
-        if Speed <= 0:
+        if no_points_count > 50:
             StopAll()
-            break
     return middle, image_rgb
 
 
@@ -116,6 +115,7 @@ if __name__ == "__main__":
     session = app.session()
     motion_service = session.service("ALMotion")
     video_cam_service, nameId_Cam = Kamera_Vorbrereiten()
+    no_points_count = 0
     while True:
         raw = get_raw()
         image_array_bgr = image_array(raw)
@@ -126,4 +126,5 @@ if __name__ == "__main__":
             cv.destroyAllWindows()
             StopAll()
             break
+
         time.sleep(1)
