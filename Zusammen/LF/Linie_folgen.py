@@ -18,11 +18,12 @@ fps = 30
 
 
 def Kamera_Vorbrereiten():
+
     video_cam_service = session.service("ALVideoDevice")
-    global.nameId_Cam = video_cam_service.subscribeCamera("Kamera_Get", CamId, Res, ColorSpace, fps)
+    nameId_Cam = video_cam_service.subscribeCamera("Kamera_Get", CamId, Res, ColorSpace, fps)
     effector = 43 # Foucs
     video_cam_service.setParameter(CamId,effector,30)
-    return video_cam_service
+    return video_cam_service, nameId_Cam
 
 def get_raw(video_cam_service):
     return video_cam_service.getImageRemote(nameId_Cam)
@@ -87,12 +88,11 @@ def MittelPunkt_folgen(image):
 
 
 def Move(exzentierung):
-    x_Speed = 0.08
-    y_Speed = 0
+    x_Speed = 0.0
+    y_Speed = 0.0
     kp = 0.5
     ki = 0.0
     kd = 0.0
-    count = 
 
     pid = PID(kp,ki,kd, setpoint=0.)
     if firsttime:
@@ -105,15 +105,17 @@ def Move(exzentierung):
 
 def StopAll():
     motion_service.stopMove()
+    time.sleep(5)
     motion_service.rest()
     
 
 
 if __name__ == "__main__":
-    session = qi.session()
-    session.connect(""tcp://10.0.158.231:9559"")
+    app = qi.Application(url="")
+    app.start()
+    session = app.session()
     motion_service = session.service("ALMotion")
-    video_cam_service = Kamera_Vorbrereiten()
+    video_cam_service, nameId_Cam = Kamera_Vorbrereiten()
     while True:
         raw = get_raw()
         image_array_bgr = image_array(raw)

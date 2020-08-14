@@ -15,18 +15,7 @@ Res = 3
 ColorSpace = 13
 # FPS
 fps = 5
-# tempFile
-# frame_path = tempfile.mkstemp()[1]
-## Verbinden mit App
-# try:
-#     app = qi.Application(url="tcp://10.0.158.231:9559")
-# except RuntimeError:
-#     print"error!!"
-#     sys.exit(1)
 
-# app.start()
-# session = qi.session()
-#Verbinden mit Session
 try:
     session.connect(""tcp://10.0.158.231:9559"")
 except RuntimeError:

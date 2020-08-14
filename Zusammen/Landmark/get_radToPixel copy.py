@@ -42,7 +42,7 @@ class LandMarksToPixel():
         MarkInfo = datei[1]
         if len[MarkInfo] < 4:
             self.got_4landmark = False
-
+            
         elif not self.got_4landmark:
             self.got_4landmark = True
             print "I saw 4 landmarks!"
@@ -54,6 +54,30 @@ class LandMarksToPixel():
                 id = mark_info[1]
                 self.mark_dict[id] = (alpha, beta)
 
+    def HeadMarkZentierung(self):
+        winkel_summe = np.zeros((1,2), np.float)
+        for _, winkel in mark_dict.items():
+            winkel_array = np.array(winkel)
+            winkel_summe = winkel_summe + winkel_array
+            names  = ["HeadYaw", "HeadPitch"]
+            angles = (winkel_summe/4).tolist()[0]
+            fractionMaxSpeed  = 0.05
+            try:
+                self.motion_service.changeAngles(names, angles, fractionMaxSpeed)
+                time.sleep(2)
+                return True
+
+            except RuntimeError:
+                print "Fehler! Die Rcihtung der Kamera nicht eingestellt werden kann!"
+                return False
+
+    def TorsoZentierung(self):
+        name            = "CameraTop"
+        frame           = motion.FRAME_ROBOT
+        useSensorValues = True
+        result          = motion_service.getPosition(name, frame, useSensorValues)
+        Cam_Top_6D = self.motion_service.getPosition()
+        
 if __name__ == "__main__":
     app = qi.application(url="")
     img = cv.imread("./klein/4_Landmark/datei/fotos/001.png")
