@@ -15,13 +15,14 @@ pose = session.service("ALRobotPosture")
 life = session.service("ALAutonomousLife")
 autonomous_service = session.service("ALAutonomousLife")
 
-
+motion.rest()
 # pose.goToPosture("StandInit", 0.5)
 # motion.moveTo(0,0,180)
 pose.goToPosture("Stand", 0.5)
 time.sleep(5)
 # autonomous_service.setState("disabled")
-
+motion.setIdlePostureEnabled("Body", False)
+motion.rest()
 time.sleep(10)
 # motion.rest()
 # motion.wakeUp()

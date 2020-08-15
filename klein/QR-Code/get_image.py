@@ -31,11 +31,12 @@ pose = session.service("ALRobotPosture")
 video_cam = session.service("ALVideoDevice")
 # Subscribe Kamera
 nameId = video_cam.subscribeCamera("Kamera_Get", CamId, Res, ColorSpace, fps)
-video_cam.setParameter(0,40,1)
-count = 0
+video_cam.setParameter(0,40,0)
+count = 960
 while True:
     # Get Image
     time.sleep(3)
+    video_cam.setParameter(0,43,30)
     image_raw = video_cam.getImageRemote(nameId)
     image_array_binary = image_raw[6]
     w = image_raw[0]
@@ -54,7 +55,7 @@ while True:
     if k == ord("s"):
         count += 1
         name = str(count).zfill(3) + ".png"
-        cv.imwrite("./klein/QR-Code/datei/"+ name, image_array_bgr)
+        cv.imwrite("./klein/Dreiecks/datei/"+ name, image_array_bgr)
     elif k == ord("n"):
         pass
     else:
