@@ -17,24 +17,25 @@ ColorSpace = 13
 fps = 30.0
 
 
-
 def Kamera_Vorbrereiten():
     video_cam_service = session.service("ALVideoDevice")
-    nameId_Cam = video_cam_service.subscribeCamera("Kamera_Get16", CamId, Res, ColorSpace, fps)
+    nameId_Cam = video_cam_service.subscribeCamera("Kamera_Get16", CamId, Res,
+                                                   ColorSpace, fps)
     time.sleep(3)
     motion_service.rest()
-    posture_service.goToPosture("Stand",0.3)
+    posture_service.goToPosture("Stand", 0.3)
     motion_service.setIdlePostureEnabled("Body", False)
     motion_service.moveInit()
     motion_service.setStiffnesses("Head", 1.0)
-    motion_service.setAngles(["Head"], (0.,(35/180)*math.pi),0.02)    
-    effector = 43 # Foucs
-    video_cam_service.setParameter(CamId,effector,30)
-    video_cam_service.setParameter(CamId,0,50)
-    video_cam_service.setParameter(CamId,1,32)
-    video_cam_service.setParameter(CamId,11,0)
-    video_cam_service.setParameter(CamId,17,16)
+    motion_service.setAngles(["Head"], (0., (35 / 180) * math.pi), 0.02)
+    effector = 43  # Foucs
+    video_cam_service.setParameter(CamId, effector, 30)
+    video_cam_service.setParameter(CamId, 0, 50)
+    video_cam_service.setParameter(CamId, 1, 32)
+    video_cam_service.setParameter(CamId, 11, 0)
+    video_cam_service.setParameter(CamId, 17, 16)
     return video_cam_service, nameId_Cam
+
 
 def get_raw():
     return video_cam_service.getImageRemote(nameId_Cam)
@@ -73,22 +74,24 @@ def MittelPunkt_folgen(image):
     start_height = h - 5
     image_gray = cv.cvtColor(image, cv.COLOR_BGR2GRAY)
     image_rgb = cv.cvtColor(image, cv.COLOR_BGR2RGB)
-    image_gray = cv.GaussianBlur(image_gray, (5,5),0)
+    image_gray = cv.GaussianBlur(image_gray, (5, 5), 0)
     ret, thresh = cv.threshold(image_gray, 80, 255, cv.THRESH_BINARY)
 
     # thresh = cv.adaptiveThreshold(image_gray, 255, cv.ADAPTIVE_THRESH_GAUSSIAN_C, cv.THRESH_BINARY, 17, 2)
     signed_thresh = thresh[start_height].astype(np.int16)
     diff = np.diff(signed_thresh)
     points = np.where(np.logical_or(diff > 220, diff < -220))
-    cv.line(image_rgb, (0,start_height),(w, start_height), (0, 255,0), 1)
+    cv.line(image_rgb, (0, start_height), (w, start_height), (0, 255, 0), 1)
 
-    if len(points) > 0 and len(points[0]) > 1:   # schwarze linie gefunden
+    if len(points) > 0 and len(points[0]) > 1:  # schwarze linie gefunden
         middle = (points[0][0] + points[0][-1]) / 2
-        cv.circle(image_rgb, (points[0][0], start_height), 15, (255,0,0), -1) # zeichnen rechte grenze
-        cv.circle(image_rgb, (points[0][-1], start_height), 15, (0,255,0), -1)
-        cv.circle(image_rgb, (middle, start_height), 15, (0,0,255), -1)
-        exzentierung = middle - w/2
-        print exzentierung, middle, w/2
+        cv.circle(image_rgb, (points[0][0], start_height), 15, (255, 0, 0),
+                  -1)  # zeichnen rechte grenze
+        cv.circle(image_rgb, (points[0][-1], start_height), 15, (0, 255, 0),
+                  -1)
+        cv.circle(image_rgb, (middle, start_height), 15, (0, 0, 255), -1)
+        exzentierung = middle - w / 2
+        print exzentierung, middle, w / 2
         Move(exzentierung)
     # else:
     #     start_height -= 5
@@ -106,22 +109,22 @@ def Move(exzentierung):
     ki = 0.0
     kd = 50.0
 
-    pid = PID(kp,ki,kd, setpoint=0.)
+    pid = PID(kp, ki, kd, setpoint=0.)
     global firsttime
     if firsttime:
         pid.output_limits = (-1., 1.)
         firsttime = False
 
-    rot = (math.pi/10) * pid(exzentierung)
+    rot = (math.pi / 10) * pid(exzentierung)
     print rot
     # rot = kp * (math.pi / 4) * (-exzentierung * 2/ w)
     motion_service.move(x_Speed, y_Speed, rot)
+
 
 def StopAll():
     motion_service.stopMove()
     time.sleep(5)
     motion_service.rest()
-    
 
 
 if __name__ == "__main__":
