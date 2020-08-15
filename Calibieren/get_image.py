@@ -9,8 +9,8 @@ import sys
 
 # 0 ist obere Kamera
 CamId = 0
-# 3 ist k4VGA
-Res = 3
+# 3 ist k4VGA,2 ist VGA
+Res = 1
 #BGR-13, YUV422-9
 ColorSpace = 13
 # FPS
@@ -30,11 +30,13 @@ motion = session.service("ALMotion")
 pose = session.service("ALRobotPosture")
 video_cam = session.service("ALVideoDevice")
 # Subscribe Kamera
-nameId = video_cam.subscribeCamera("Kamera_Get3", CamId, Res, ColorSpace, fps)
-
-count = 0
+nameId = video_cam.subscribeCamera("Kamera_Get", CamId, Res, ColorSpace, fps)
+video_cam.setParameter(0,40,0)
+count = 320
 while True:
     # Get Image
+    time.sleep(3)
+    video_cam.setParameter(0,43,30)
     image_raw = video_cam.getImageRemote(nameId)
     image_array_binary = image_raw[6]
     w = image_raw[0]

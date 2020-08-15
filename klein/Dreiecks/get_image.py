@@ -32,7 +32,7 @@ video_cam = session.service("ALVideoDevice")
 # Subscribe Kamera
 nameId = video_cam.subscribeCamera("Kamera_Get", CamId, Res, ColorSpace, fps)
 video_cam.setParameter(0,40,0)
-count = 60
+count = 960
 while True:
     # Get Image
     time.sleep(3)
