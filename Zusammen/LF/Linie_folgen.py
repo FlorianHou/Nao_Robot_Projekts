@@ -93,13 +93,6 @@ def MittelPunkt_folgen(image):
         exzentierung = middle - w / 2
         print exzentierung, middle, w / 2
         Move(exzentierung)
-    # else:
-    #     start_height -= 5
-    #     start_height = start_height % h
-    #     no_points_count += 1
-    #     if Count > 20:
-    #         StopAll()
-    return middle, image_rgb, thresh
 
 
 def Move(exzentierung):
