@@ -5,14 +5,13 @@ from matplotlib import pyplot as plt
 sp_dict= dict()   #SchnittPunkte Dict
 
 def get_dreieck():
-    img = cv.imread("klein/Dreiecks/datei/322.png")
     gray = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
     # img_blur_gau = cv.GaussianBlur(img, (3,3), 0)
-    img_blur_gau = cv.bilateralFilter(img,9,75,75)
-    img_hsv = cv.cvtColor(img_blur_gau, cv.COLOR_BGR2HSV)
-    img_g = cv.inRange(img_hsv, (50,100,60), (70, 255,200))
-
-    return img_blur_gau, img_g
+    img_blur = cv.bilateralFilter(img,9,75,75)
+    img_hsv = cv.cvtColor(img_blur, cv.COLOR_BGR2HSV)
+    img_g = cv.inRange(img_hsv, (50,100,60), (70, 255,200))  # Grünen Bereich
+    contours, hierarchy  = cv.findContours(img_g, cv.RETR_TREE, cv.CHAIN_APPROX_NONE)
+    return contours
 
 def EndPunkt(contours):
     aussen = contours[0]
@@ -33,21 +32,21 @@ def EndPunkt(contours):
 
     # print(sp_dict)
 
+def Contours():
+    contours, hierarchy  = cv.findContours(img_g, cv.RETR_TREE, cv.CHAIN_APPROX_NONE)
+
 
 if __name__ == "__main__":
-    img, img_g = get_dreieck()
-    contours, hierarchy  = cv.findContours(img_g, cv.RETR_TREE, cv.CHAIN_APPROX_NONE)
+    img = cv.imread("klein/Dreiecks/datei/322.png")
+    contours = get_dreieck()
     cv.drawContours(img, contours, 0, (255,0,0),2)
-    print(contours)
     EndPunkt(contours)
+
     for punkt in sp_dict.values():
         cv.circle(img, tuple(punkt[0]), 1, (0,0,255), -1)
 
-    plt.subplot(121)
+    plt.subplot()
     plt.imshow(cv.cvtColor(img,cv.COLOR_BGR2RGB))
-    plt.subplot(122)
-    plt.imshow(img_g, "gray")
-
     plt.show()
 
 
