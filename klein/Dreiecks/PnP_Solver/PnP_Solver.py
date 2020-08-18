@@ -8,9 +8,9 @@ with np.load(".\klein\\Dreiecks\\PnP_Solver\\datei\\zusammen_oben_320.npz") as f
 
 def draw(img, corners, imgpts):
     corner = tuple(corners2[0].ravel())
-    img = cv.line(img, corner, tuple(imgpts[0].ravel()), (255, 0, 0), 2)
-    img = cv.line(img, corner, tuple(imgpts[1].ravel()), (0, 255, 0), 2)
-    img = cv.line(img, corner, tuple(imgpts[2].ravel()), (0, 0, 255), 2)
+    img = cv.line(img, corner, tuple(imgpts[0].ravel()), (255, 0, 0), 3)
+    img = cv.line(img, corner, tuple(imgpts[1].ravel()), (0, 255, 0), 3)
+    img = cv.line(img, corner, tuple(imgpts[2].ravel()), (0, 0, 255), 3)
     return img
 
 
@@ -23,19 +23,21 @@ def ecks_dreieck():
 
 def PnP_Solve():
 
-    objp = np.array([[0, 0, 0], [0, -7.49, 11.2], [0, 7.45, 11.2], [0, 0, 10.3],
-                    [0,-2.8, 4.7], [0, 2.8, 4.7]], np.float32) # Pinkt in realem Welt
+    objp = np.array([[0, 0, 0], [-7.49, 11.2,0], [7.45, 11.2,0], [0, 10.3, 0],
+                    [-2.8, 4.7,0], [2.8, 4.7,0]], np.float32) # Pinkt in realem Welt
+    global corners2
     corners2 = ecks_dreieck() # Aus Bild
     ret, rvecs, tvecs = cv.solvePnP(objp, corners2, mtx, dist)
     rvecs_tr=cv.Rodrigues(rvecs)[0] #RotationsVektor zu Rotationstransform
-    return rvecs_tr, tvecs
+    return rvecs, rvecs_tr, tvecs
 
 
-axis = np.float32([[5, 0, 0], [0, 5, 0], [0, 0, -5]]).reshape(-1, 3)
+axis = np.float32([[5, 0, 0], [0, 5, 0], [0, 0, 5]]).reshape(-1, 3)
 
 img = cv.imread("klein\\Dreiecks\\PnP_Solver\\datei\\322.png")
 gray = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
-
+rvecs, rvecs_tr, tvecs = PnP_Solve()
+print (rvecs, "\n##########\n", tvecs)
 imgpts, jac = cv.projectPoints(axis, rvecs, tvecs, mtx, dist)
 
 with open("klein\Dreiecks\PnP_Solver\datei\PnP_Ergebnis.npz", "wb") as file:
