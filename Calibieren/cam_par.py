@@ -13,7 +13,7 @@ imgpoints = []
 gray = np.array([])
 # path = 'C:/Users/zhaoy/python/opencv/Kalibieren/datei'
 # images = glob.glob(os.path.join(path, "foto_1/*.png"))
-images = glob.glob("./Calibieren/datei/foto_1/*.png")
+images = glob.glob("./Calibieren/datei/foto_1_960/*.png")
 print(images)
 
 for fname in images:
@@ -38,6 +38,6 @@ ret, mtx, dist, rvecs, tvecs = cv.calibrateCamera(objpoints, imgpoints,
 
 #Speichen
 zusammen = {"mtx": mtx, "dist": dist, "rvecs": rvecs, "tvecs": tvecs}
-with open("./Calibieren/datei/zusammen_oben.npz", "wb") as file:
+with open("./Calibieren/datei/zusammen_oben_960.npz", "wb") as file:
     np.savez(file, mtx=mtx, dist=dist, rvecs=rvecs, tvecs=tvecs)
 print(zusammen)

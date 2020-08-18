@@ -37,7 +37,7 @@ def Contours():
 
 
 if __name__ == "__main__":
-    img = cv.imread("klein/Dreiecks/datei/322.png")
+    img = cv.imread("klein/Dreiecks/datei/323.png")
     contours = get_dreieck()
     cv.drawContours(img, contours, 0, (255,0,0),2)
     EndPunkt(contours)
@@ -49,5 +49,10 @@ if __name__ == "__main__":
     plt.imshow(cv.cvtColor(img,cv.COLOR_BGR2RGB))
     plt.show()
 
-
+    try:
+        with open("klein\Dreiecks\PnP_Solver\datei\\6Punkten.npz", "wb") as file:
+            np.savez(file, dict=np.array(sp_dict))
+            print(file)
+    except RuntimeError:
+        print("Leider...")
     
