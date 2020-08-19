@@ -11,7 +11,7 @@ def draw(img, corners, imgpts):
     corner = tuple(corners2[0].ravel())
     img = cv.line(img, corner, tuple(imgpts[0].ravel()), (255, 0, 0), 3)
     img = cv.line(img, corner, tuple(imgpts[1].ravel()), (0, 255, 0), 3)
-    # img = cv.line(img, corner, tuple(imgpts[2].ravel()), (0, 0, 255), 3)
+    img = cv.line(img, corner, tuple(imgpts[2].ravel()), (0, 0, 255), 3)
     return img
 
 
@@ -19,7 +19,7 @@ def ecks_dreieck():
     with np.load("klein/Dreiecks/PnP_Solver/datei/6Punkten.npz",
                  allow_pickle=True) as file:
         sp_dict = file["dict"].tolist()
-    ecks = [i[0].tolist() for i in sp_dict.values()]
+    ecks = [sp_dict[i][0].tolist() for i in ["a","b","c","d","e","f"]]
     return np.array(ecks, np.float32)
 
 def PnP_Solve():
@@ -41,7 +41,7 @@ def PnP_Solve():
 
 axis = np.float32([[5, 0, 0], [0, 5, 0], [0, 0, 5]]).reshape(-1, 3)
 
-img = cv.imread("klein/Dreiecks/PnP_Solver/datei/321.png")
+img = cv.imread("klein/Dreiecks/PnP_Solver/datei/322.png")
 gray = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
 
 rvecs, rvecs_tr, tvecs, corners2 = PnP_Solve()
