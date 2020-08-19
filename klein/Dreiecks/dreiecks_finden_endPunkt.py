@@ -9,7 +9,7 @@ def get_dreieck():
     # img_blur_gau = cv.GaussianBlur(img, (3,3), 0)
     img_blur = cv.bilateralFilter(img,9,75,75)
     img_hsv = cv.cvtColor(img_blur, cv.COLOR_BGR2HSV)
-    img_g = cv.inRange(img_hsv, (50,100,60), (70, 255,200))  # Grünen Bereich
+    img_g = cv.inRange(img_hsv, (50,100,60), (70, 255,200))  # Gruenen Bereich
     contours, hierarchy  = cv.findContours(img_g, cv.RETR_TREE, cv.CHAIN_APPROX_NONE)
     return contours
 
@@ -37,7 +37,7 @@ def Contours():
 
 
 if __name__ == "__main__":
-    img = cv.imread("klein/Dreiecks/datei/322.png")
+    img = cv.imread("./klein/Dreiecks/datei/322.png")
     contours = get_dreieck()
     cv.drawContours(img, contours, 0, (255,0,0),2)
     EndPunkt(contours)
@@ -50,9 +50,9 @@ if __name__ == "__main__":
     plt.show()
 
     try:
-        with open("klein\Dreiecks\PnP_Solver\datei\\6Punkten.npz", "wb") as file:
+        with open("klein/Dreiecks/PnP_Solver/datei/6Punkten.npz", "wb") as file:
             np.savez(file, dict=np.array(sp_dict))
-            print(file)
+            print(sp_dict)
     except RuntimeError:
         print("Leider...")
     
