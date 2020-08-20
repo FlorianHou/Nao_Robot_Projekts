@@ -2,6 +2,7 @@ import numpy as np
 import cv2 as cv
 import glob
 import math
+import almath
 
 with np.load("klein/Dreiecks/PnP_Solver/datei/zusammen_oben_320.npz") as file:
     mtx, dist, _, _ = [file[i] for i in ("mtx", "dist", "rvecs", "tvecs")]
@@ -31,13 +32,20 @@ def PnP_Solve():
     rvecs_tr=cv.Rodrigues(rvecs)[0] #RotationsVektor zu Rotationstransform
     return rvecs, rvecs_tr, tvecs, corners2
 
-# def Koordination_Opencv2RobotKamera():
-#     RotX = almath.Transform.fromRotX(-math.pi/2)
-#     RotZ = almath.Transform.fromRotY(-math.pi/2)
-#     a = np.array(PnP_Ergebnis_dict["rvecs_tr"])
-#     b = np.array(PnP_Ergebnis_dict["tvecs"])
-#     Transform_Op = np.hstack((a,b)).flatten()
-#     Transform_Ro = almath.Transform(Transform_Op)
+def Koordination_Opencv2RobotKamera():
+    RotX_1 = almath.Transform.fromRotX(-math.pi/2)
+    RotZ_1 = almath.Transform.fromRotY(-math.pi/2)
+    RotY_2 = almath.Transform.fromRotY(-math.pi/2)
+    RotX_2 = almath.Transform.fromRotX(math.pi/2)
+    a = np.array(PnP_Ergebnis_dict["rvecs_tr"])
+    b = np.array(PnP_Ergebnis_dict["tvecs"])
+    Transform_Cam2Ziel_OP = np.hstack((a,b))
+    return Transform_Cam2Ziel_OP = almath.Transform(Transform_Cam2Ziel_OP.flatten())
+
+def Robot2Ziel(session):
+    
+
+
 
 axis = np.float32([[5, 0, 0], [0, 5, 0], [0, 0, 5]]).reshape(-1, 3)
 
