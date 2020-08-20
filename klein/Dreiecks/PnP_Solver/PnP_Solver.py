@@ -32,19 +32,32 @@ def PnP_Solve():
     rvecs_tr=cv.Rodrigues(rvecs)[0] #RotationsVektor zu Rotationstransform
     return rvecs, rvecs_tr, tvecs, corners2
 
-def Koordination_Opencv2RobotKamera():
+def Cam2Ziel_OP():
+    a = np.array(PnP_Ergebnis_dict["rvecs_tr"])
+    b = np.array(PnP_Ergebnis_dict["tvecs"])
+    Transform_Cam2Ziel_OP = np.hstack((a,b))
+    Transform_Cam2Ziel_OP = almath.Transform(Transform_Cam2Ziel_OP.flatten())
+    return Transform_Cam2Ziel_OP
+
+def Robot2Ziel_ROB(robot2CamROB):
+    """Robot zu Ziel"""
     RotX_1 = almath.Transform.fromRotX(-math.pi/2)
     RotZ_1 = almath.Transform.fromRotY(-math.pi/2)
     RotY_2 = almath.Transform.fromRotY(-math.pi/2)
     RotX_2 = almath.Transform.fromRotX(math.pi/2)
-    a = np.array(PnP_Ergebnis_dict["rvecs_tr"])
-    b = np.array(PnP_Ergebnis_dict["tvecs"])
-    Transform_Cam2Ziel_OP = np.hstack((a,b))
-    return Transform_Cam2Ziel_OP = almath.Transform(Transform_Cam2Ziel_OP.flatten())
 
-def Robot2Ziel(session):
-    
+    robot2CamOP = robot2CamROB * RotZ_1 * RotX_1
+    robot2ZielOP = robot2CamOP * Cam2Ziel_OP()
+    robot2ZielROB = robot2ZielOP * RotY_2 * RotX_2
+    return robot2ZielROB
 
+def get_ROB2CAM():
+    session = app.Session()
+    session.connect("tcp://10.0.158.231:9559")
+    motion = session.service("ALMotion")
+    robot2CamROB = motion.getTranform("CameraTop", 2, True)
+    robot2CamROB = almath.Transform(robot2CamROB)
+    return robot2CamROB
 
 
 axis = np.float32([[5, 0, 0], [0, 5, 0], [0, 0, 5]]).reshape(-1, 3)
