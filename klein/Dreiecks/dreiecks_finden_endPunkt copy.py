@@ -45,7 +45,7 @@ def Contours():
 
 
 if __name__ == "__main__":
-    img = cv.imread("./klein/Dreiecks/datei/962.png")
+    img = cv.imread("./klein/Dreiecks/datei/961.png")
     contours = get_dreieck()
     cv.drawContours(img, contours, -1, (255,0,0),5)
     EndPunkt(contours)

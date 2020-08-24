@@ -5,7 +5,7 @@ import math
 
 k_dict = {}
 
-img = cv.imread("./klein/Dreiecks/datei/011.png")
+img = cv.imread("./klein/Dreiecks/datei/321.png")
 ##Blur
 # img = cv.GaussianBlur(img, (5,5), 0)
 img = cv.bilateralFilter(img, 9, 75, 75)
