@@ -20,7 +20,8 @@ fps = 30
 # tempFile
 # frame_path = tempfile.mkstemp()[1]
 try:
-    app = qi.Application(url="tcp://10.0.147.226:9559")
+    # app = qi.Application(url="tcp://10.0.147.226:9559")
+    app = qi.Application(url="tcp://192.168.1.101:11148")
 except RuntimeError:
     print"error!!"
     sys.exit(1)
