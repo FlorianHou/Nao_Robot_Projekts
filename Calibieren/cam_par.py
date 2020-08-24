@@ -25,11 +25,11 @@ for fname in images:
     if ret is True:
         objpoints.append(objp)
 
-        corners2 = cv.cornerSubPix(gray, corners, (5, 5), (-1, -1), criteria)
+        corners2 = cv.cornerSubPix(gray, corners, (11, 11), (-1, -1), criteria)
         imgpoints.append(corners2)
         cv.drawChessboardCorners(img, (9, 7), corners2, ret)
         cv.imshow("img", img)
-        cv.waitKey(2)
+        cv.waitKey(1000)
 
 cv.destroyAllWindows()
 print("Shape:", gray.shape)
@@ -38,6 +38,6 @@ ret, mtx, dist, rvecs, tvecs = cv.calibrateCamera(objpoints, imgpoints,
 
 #Speichen
 zusammen = {"mtx": mtx, "dist": dist, "rvecs": rvecs, "tvecs": tvecs}
-with open("./Calibieren/datei/zusammen_oben_960.npz", "wb") as file:
+with open("./Calibieren/datei/zusammen_oben_960_2.npz", "wb") as file:
     np.savez(file, mtx=mtx, dist=dist, rvecs=rvecs, tvecs=tvecs)
 print(zusammen)
