@@ -4,7 +4,8 @@ import math
 import time
 
 try:
-    app = qi.Application(url="tcp://10.0.158.231:9559")
+    # app = qi.Application(url="tcp://10.0.147.226:9559")
+    app = qi.Application(url="tcp://192.168.1.101:1226")
 except RuntimeError:
     print"error!!"
     sys.exit(1)
@@ -14,16 +15,24 @@ motion = session.service("ALMotion")
 pose = session.service("ALRobotPosture")
 life = session.service("ALAutonomousLife")
 autonomous_service = session.service("ALAutonomousLife")
+autonomous_service.setState("disabled")
 
 motion.rest()
+
 # pose.goToPosture("StandInit", 0.5)
-# motion.moveTo(0,0,180)
-pose.goToPosture("Stand", 0.5)
-time.sleep(5)
 # autonomous_service.setState("disabled")
-motion.setIdlePostureEnabled("Body", False)
-motion.rest()
-time.sleep(10)
+
+
+pose.goToPosture("Stand", 0.5)
+motion.setAngles(["HeadPitch"], [15*(math.pi/180)], 0.1)
+
+
+time.sleep(2)
+# pose.goToPosture("Stand", 0.5)
+# life.stopAll()
+# motion.setIdlePostureEnabled("Body", False)
+# motion.rest()
+# time.sleep(10)
 # motion.rest()
 # motion.wakeUp()
 # life.stopAll()
