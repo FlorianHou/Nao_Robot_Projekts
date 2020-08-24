@@ -27,7 +27,7 @@ except RuntimeError:
 pose = session.service("ALRobotPosture")
 video_cam = session.service("ALVideoDevice")
 # Subscribe Kamera
-nameId = video_cam.subscribeCamera("Kamera_Get", CamId, Res, ColorSpace, fps)
+nameId = video_cam.subscribeCamera("Kamera_Get11", CamId, Res, ColorSpace, fps)
 video_cam.setParameter(0,40,0)
 count = 60
 while True:

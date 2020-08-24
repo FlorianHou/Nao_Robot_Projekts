@@ -10,7 +10,7 @@ import sys
 # 0 ist obere Kamera
 CamId = 0
 # 3 ist k4VGA(1280*960),2 ist VGA(640), 1 ist 320*240, 0 ist 176*..
-Res = 3
+Res = 1
 #BGR-13(nicht RGB)
 ColorSpace = 13
 # FPS
@@ -35,10 +35,13 @@ nameId = video_cam.subscribeCamera("Kamera_Get100", CamId, Res, ColorSpace, fps)
 count = 960
 while True:
     # Get Image
-    time.sleep(3)
+    # time.sleep(3)
     # http://doc.aldebaran.com/2-8/naoqi/vision/alvideodevice-api.html#ALVideoDeviceProxy::setParameter__iCR.iCR.iCR
     # http://doc.aldebaran.com/2-8/family/nao_technical/video_naov6.html#supported-parameters
     video_cam.setParameter(0, 40, 1)
+    video_cam.setParameter(0, 11, 0)    
+    video_cam.setParameter(0, 17, 900)
+
     image_raw = video_cam.getImageRemote(nameId)
     image_array_binary = image_raw[6]
     w = image_raw[0]
@@ -50,8 +53,8 @@ while True:
     image_array_bgr = image_array #BGR
     # #Show Bild
     cv.imshow("img", image_array_bgr)
-    k = cv.waitKey(0)
-    # k = cv.waitKey(5) # Kontinuierliche Frame
+    # k = cv.waitKey(0)
+    k = cv.waitKey(1) # Kontinuierliche Frame
     # # cv.destroyAllWindows()
     # druck "s" zu speichen, "q" zu schliessen, anderer Taster zu naeschste Bild wechseln
     if k == ord("s"):
