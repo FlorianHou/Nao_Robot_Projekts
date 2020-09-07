@@ -13,7 +13,7 @@ imgpoints = []
 gray = np.array([])
 # path = 'C:/Users/zhaoy/python/opencv/Kalibieren/datei'
 # images = glob.glob(os.path.join(path, "foto_1/*.png"))
-images = glob.glob("./Calibieren/datei/foto_1_960/*.png")
+images = glob.glob("./Calibieren/datei/foto_1_2000/*.png")
 print(images)
 
 for fname in images:

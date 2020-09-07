@@ -3,7 +3,7 @@ import cv2 as cv
 import glob
 import os
 
-with np.load("Calibieren/datei/zusammen_oben_960.npz") as file:
+with np.load("Calibieren/datei/zusammen_oben_2000.npz") as file:
     mtx, dist, _, _ = [file[i] for i in ("mtx", "dist", "rvecs", "tvecs")]
 
 
@@ -21,7 +21,7 @@ objp[:, :2] = np.mgrid[0:9, 0:7].T.reshape(-1, 2)
 axis = np.float32([[3, 0, 0], [0, 3, 0], [0, 0, -3]]).reshape(-1, 3)
 
 path = 'Calibieren/datei'
-fname = glob.glob(os.path.join(path, "foto_1_960/*.png"))
+fname = glob.glob(os.path.join(path, "foto_1_2000/*.png"))
 for fname in fname:
     img = cv.imread(fname)
     gray = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
@@ -32,7 +32,7 @@ for fname in fname:
 
         imgpts, jac = cv.projectPoints(axis, rvecs, tvecs, mtx, dist)
         img = draw(img, corners, imgpts)
-        cv.imshow("img", img)
+        cv.imshow("img", cv.resize(img,(640,480)))
         k = cv.waitKey(0)
         if k == ord("s"):
             cv.imwrite(fname[:6] + ".png", img)
