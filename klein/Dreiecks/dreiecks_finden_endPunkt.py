@@ -5,20 +5,28 @@ from matplotlib import pyplot as plt
 sp_dict= dict()   #SchnittPunkte Dict
 
 def get_dreieck():
+    global img
     gray = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
-    img_blur = cv.GaussianBlur(img, (1,1), 0)
-    global img_blur
+    # img = cv.GaussianBlur(img, (9,9), 0)
     # img_blur = cv.bilateralFilter(img,11,75,75)
-    # img_blur = cv.bilateralFilter(img,11,35,35)
+    img = cv.bilateralFilter(img,11,35,35)
 
-    img_hsv = cv.cvtColor(img_blur, cv.COLOR_BGR2HSV)
+    img_hsv = cv.cvtColor(img, cv.COLOR_BGR2HSV)
     global img_g
     img_g = cv.inRange(img_hsv, (60,100,60), (80, 255,255))  # Gruenen Bereich
+    # img_g = cv.GaussianBlur(img_g, (9,9), 0)
+
     kernel = np.ones((3,3),np.uint8)
-    img_g = cv.morphologyEx(img_g, cv.MORPH_OPEN, kernel)
-    img_g = cv.morphologyEx(img_g, cv.MORPH_CLOSE, kernel)
+    # img_g = cv.morphologyEx(img_g, cv.MORPH_OPEN, kernel)
+    # img_g = cv.morphologyEx(img_g, cv.MORPH_CLOSE, kernel)
+    img_g = cv.dilate(img_g,kernel,iterations = 1)
     contours, hierarchy  = cv.findContours(img_g, cv.RETR_TREE, cv.CHAIN_APPROX_SIMPLE)
-    return contours
+    contours_neu = []
+    for contour in contours:
+        flaeche = cv.contourArea(contour)
+        if flaeche > 150:
+            contours_neu.append(contour)
+    return contours_neu
 
 def EndPunkt(contours):
 
@@ -45,7 +53,9 @@ def Contours():
 
 
 if __name__ == "__main__":
-    img = cv.imread("./klein/Dreiecks/datei/962.png")
+    img_g = np.array([])
+    img = np.array([])
+    img = cv.imread("./klein/Dreiecks/datei/961.png")
     contours = get_dreieck()
     cv.drawContours(img, contours, -1, (255,0,0),5)
     EndPunkt(contours)
