@@ -12,13 +12,13 @@ CamId = 1
 # 3 ist k4VGA,2 ist VGA
 Res = 1
 #BGR-13, YUV422-9
-ColorSpace = 13
+ColorSpace = 0
 # FPS
 fps = 30
 
 try:
-    session = qi.session
-    session.connect("tcp://10.0.158.231:9559")
+    session = qi.Session()
+    session.connect("tcp://10.0.147.226:9559")
 except RuntimeError:
     print "error!!!"
 
@@ -34,7 +34,7 @@ while True:
     # Get Image
     time.sleep(3)
     video_cam.setParameter(0,43,30)
-    image_raw = video_cam.getImageRemote(nameId)
+    raw_datei = video_cam.getImageRemote(nameId)
     # image_array_binary = image_raw[6]
     # w = image_raw[0]
     # h = image_raw[1]
