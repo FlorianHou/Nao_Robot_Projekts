@@ -10,14 +10,14 @@ import sys
 # 0 ist obere Kamera
 CamId = 0
 # 3 ist k4VGA(1280*960),2 ist VGA(640), 1 ist 320*240, 0 ist 176*..
-Res = 1
+Res = 4
 #BGR-13(nicht RGB)
-ColorSpace = 13
+ColorSpace = 9
 # FPS
 fps = 30
 
 try:
-    app = qi.Application(url="tcp://10.0.147.226:9559")
+    app = qi.Application(url="tcp://10.0.158.231:9559")
 except RuntimeError:
     print"error!!"
     sys.exit(1)
@@ -40,21 +40,25 @@ while True:
     # http://doc.aldebaran.com/2-8/family/nao_technical/video_naov6.html#supported-parameters
     video_cam.setParameter(0, 40, 1)
     video_cam.setParameter(0, 11, 0)    
-    video_cam.setParameter(0, 17, 900)
-
+    video_cam.setParameter(0, 17, 500)
+    t1 = time.time()
     image_raw = video_cam.getImageRemote(nameId)
+    t2 = time.time()
+    print t2-t1
     image_array_binary = image_raw[6]
     w = image_raw[0]
     h = image_raw[1]
 
     image_array_string = str(bytearray(image_array_binary))
     image_array = np.fromstring(image_array_string, np.uint8)
-    image_array = image_array.reshape(h, w, 3)
+    image_array = image_array.reshape(h, w, -1)
     image_array_bgr = image_array #BGR
+    print "saving"
+    np.savez("YUV422.npz", datei=image_raw)
     # #Show Bild
-    cv.imshow("img", image_array_bgr)
+    cv.imshow("img", cv.resize(image_array_bgr, (640,480)))
     # k = cv.waitKey(0)
-    k = cv.waitKey(1) # Kontinuierliche Frame
+    k = cv.waitKey(30) # Kontinuierliche Frame
     # # cv.destroyAllWindows()
     # druck "s" zu speichen, "q" zu schliessen, anderer Taster zu naeschste Bild wechseln
     if k == ord("s"):
