@@ -4,7 +4,7 @@ import glob
 import time
 
 
-with np.load("klein/Dreiecks/PnP_Solver/datei/zusammen_oben_960.npz") as file:
+with np.load("klein/Dreiecks/PnP_Solver/datei/zusammen_oben_2000.npz") as file:
     mtx, dist, _, _ = [file[i] for i in ("mtx", "dist", "rvecs", "tvecs")]
 
 
@@ -25,11 +25,11 @@ def ecks_dreieck():
     return np.array(ecks, np.float32)
 
 
-objp = np.array([[0, 0, 0], [-2.9, 4.7, 0], [2.9, 4.7, 0], 
+objp = np.array([[0, 0, 0], [-1.85, 4.65, 0], [1.85, 4.65, 0], 
                     [0, 10.3, 0], [-7.5, 11.2, 0], [7.5, 11.2, 0]], np.float32)
 corners = ecks_dreieck()  # Aus Bild
-axis = np.float32([[15, 0, 0], [0, 15, 0], [0, 0, -15]]).reshape(-1, 3)
-img = cv.imread("klein/Dreiecks/PnP_Solver/datei/962.png")
+axis = np.float32([[5, 0, 0], [0, 5, 0], [0, 0, 5]]).reshape(-1, 3)
+img = cv.imread("klein/Dreiecks/PnP_Solver/datei/2001.png")
 b,g,r = cv.split(img)
 criteria = (cv.TERM_CRITERIA_EPS + cv.TERM_CRITERIA_MAX_ITER, 30, 0.001)
 corner_2 = cv.cornerSubPix(g, corners,(5,5),(-1,-1),criteria)
@@ -39,7 +39,7 @@ print rvecs, "\n##########\n", tvecs
 
 imgpts, jac = cv.projectPoints(axis, rvecs, tvecs, mtx, dist)
 img = draw(img, corners, imgpts)
-cv.imshow("img", img)
+cv.imshow("img", cv.resize(img, (1200,900)))
 k = cv.waitKey(0)
 if k == ord("s"):
     cv.imwrite("axis", img)
