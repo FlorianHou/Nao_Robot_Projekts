@@ -6,7 +6,7 @@ from math import pi
 def nothing(_):
     pass
 
-img_raw = cv.imread("klein/Dreiecks/datei/2001.png")
+img_raw = cv.imread("Calibieren/datei/foto_1/20200832_A.png")
 blur_1 = cv.GaussianBlur(img_raw,(5,5),0)
 blur_2 = cv.medianBlur(img_raw,9)
 b, g, r  = cv.split(blur_2)
@@ -22,7 +22,7 @@ img_hsv_raw = cv.cvtColor(blur_2, cv.COLOR_BGR2HSV)
 h,w,_ = img_raw.shape
 bit = np.ones((h,w,3))
 img = np.ones((h,w,3))
-cv.setTrackbarPos("Threshold", "image", 120)
+cv.setTrackbarPos("Threshold", "image", 80)
 
 
 # Greun
@@ -83,8 +83,8 @@ while True:
     threshold_2 = cv.getTrackbarPos("threshold_2", "image")
     solbe = cv.getTrackbarPos("solbe", "image")
 
-    bit_b = cv.inRange(img_hsv, (90,100,80), (115,255,255))
-    bit_g = cv.inRange(img_hsv, (50, 100, 50), (80,255,255))
+    bit_b = cv.inRange(img_hsv, (100,100,40), (120,255,255))
+    bit_g = cv.inRange(img_hsv, (60, 100, 40), (80,255,255))
     kernel = np.ones((15,15))
     bit_b = cv.morphologyEx(bit_b, cv.MORPH_CLOSE, kernel)
     kernel = np.ones((10,10))
@@ -109,7 +109,10 @@ while True:
         cv.line(img,(x1,y1),(x2,y2),(0,0,255),2)
     bit = cv.cvtColor(bit, cv.COLOR_GRAY2BGR)
     # print lines
-    result = np.where(np.abs(np.diff(lines[:,0,0]))>10)[0]+1
+    lines_sort = np.argsort(lines, axis=0)[...,0]
+    lines = lines[lines_sort[:,0]]
+    diff = np.diff(lines[:,0,0])
+    result = np.where(np.abs(np.diff(lines[:,0,0]))>100)[0]+1
     print lines
 
     gruppe_0 = lines[0:result[0]]
