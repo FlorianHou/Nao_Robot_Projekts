@@ -6,8 +6,26 @@ import uuid
 import cv2 as cv
 import numpy as np
 from math import pi
+from functools import wraps
 from matplotlib import pyplot as plt
 
+## Decorater log
+schritt = 0
+def log(func):
+
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        global schritt
+        print "*"*40
+        print "Schritt: ", schritt
+        schritt += 1
+        print func.__name__
+        print time.strftime("%x, %X")
+        res = func(*args, **kwargs)
+        print "*"*60
+        return res
+
+    return wrapper
 
 class DreiecksLokalisierung():
     """Lokalisierung durch Dreiecks Mark"""
@@ -29,6 +47,7 @@ class DreiecksLokalisierung():
         self.motion_fertig = False
         self.KamIsBreit = False
 
+    @log
     def pose_init(self):
         """Zusand ruecksetzen"""
         print "Pose_Init..."
@@ -37,6 +56,7 @@ class DreiecksLokalisierung():
         self.motion_service.setAngles(["HeadPitch"], [5*(pi/180)], 0.1)
         return None
 
+    @log
     def kamBreit(self,CamId = 0,Res = 3,ColorSpace = 13,fps = 30):
         """sammelt Bild aus Nao"""
         print "Kamera vorberiten"
@@ -67,6 +87,7 @@ class DreiecksLokalisierung():
             raise RuntimeError("Kamera kann nicht initiziert werden!")
         return None
 
+    @log
     def get_image(self):
         """nehme Foto"""
         image_raw = self.video_cam.getImageRemote(self.subCamId)
@@ -76,14 +97,18 @@ class DreiecksLokalisierung():
         image_array_byte = bytearray(image_array_binary)
         image_array = np.frombuffer(
             image_array_byte, np.uint8).reshape(h, w, 3)  # array_bgr
+        image_array = cv.imread("Calibieren/datei/foto_1/20200832_A.png")
         cv.imshow("", cv.resize(image_array,(640,480)))
-        cv.waitKey(500)
+        cv.waitKey(0)
         cv.destroyAllWindows()
         return image_array
+
+    @log
     def stopp_Kamera(self):
         """Kamera stoppen"""
         return self.video_cam.unsubscribe(self.subCamId)
 
+    @log
     def get_kontours(self):
         """Bild bearbeiten und kontours detectieren"""
         print "Kontours detektieren"
@@ -112,6 +137,7 @@ class DreiecksLokalisierung():
         print str(len(kontours))
         return kontours
 
+    @log
     def get_kontours_2(self):
         self.img = self.get_image()
         # self.img = cv.imread("klein/Dreiecks/datei/2001.png")
@@ -134,14 +160,16 @@ class DreiecksLokalisierung():
         bit_bgr = cv.cvtColor(bit, cv.COLOR_GRAY2BGR)
         return approxCurves
 
+    @log
     def get_kontours_3(self):
         self.img = self.get_image()
         # self.img = cv.imread("klein/Dreiecks/datei/2001.png")
         blur = cv.medianBlur(self.img,9)
         img_hsv = cv.cvtColor(blur, cv.COLOR_BGR2HSV)
         h, w, _ = self.img.shape
+        #aussen
         img_gruen = cv.inRange(img_hsv, (60, 100, 40), (80,255,255))
-        img_blau = cv.inRange(img_hsv, (90,100,40), (115,255,255))
+        img_blau = cv.inRange(img_hsv, (100,100,40), (120,255,255))
         kernel = np.ones((15,15))
         img_blau = cv.morphologyEx(img_blau, cv.MORPH_CLOSE, kernel)
         kernel = np.ones((10,10))
@@ -151,25 +179,41 @@ class DreiecksLokalisierung():
         img_bg = cv.morphologyEx(img_bg, cv.MORPH_OPEN, kernel)
         img_bg = cv.GaussianBlur(img_bg, (3,3), 0)
         edge = cv.Canny(img_bg, 100, 200, 5)
-        lines = cv.HoughLines(img_bg, 1, pi/180, 105)
-        cv.imshow("", cv.resize(img_bg, (640,480)))
+        lines = cv.HoughLines(edge, 1, pi/180, 100)
+        cv.imshow("", cv.resize(edge, (640,480)))
         cv.waitKey(0)
         cv.destroyAllWindows()
-        aussen = self.end_Punkt(lines)
+        aussen = np.array(self.end_Punkt(lines))
+        aussen = (aussen.reshape(-1,1,2)).astype(np.int32)
         #Innen
-        img_blau = cv.inRange(img_hsv, (90,100,80), (115,255,255))
+        img_blau = cv.inRange(img_hsv, (100,100,40), (120,255,255))
         kernel = np.ones((9,9))
         img_blau = cv.morphologyEx(img_blau, cv.MORPH_CLOSE, kernel)
         kernel = np.ones((5,5))
         img_blau = cv.GaussianBlur(img_blau, (3,3), 0)
-        img_blau = cv.Canny(img_blau, 100, 200, 3)
-        lines = cv.HoughLines(img_blau, 1, pi/180, 120)
-        innen = self.end_Punkt(lines)
-        return [aussen, innen]
+        edge = cv.Canny(img_blau, 100, 200, 3)
+        lines = cv.HoughLines(edge, 1, pi/180, 50)
+        cv.imshow("", cv.resize(edge, (640,480)))
+        cv.waitKey(0)
+        cv.destroyAllWindows()
+        innen = np.array(self.end_Punkt(lines))
+        innen = (innen.reshape(-1,1,2)).astype(np.int32)
+        kontours = [aussen, innen]
+        return kontours
+    
+    @log
+    def linien_Sortieren(self, lines):
+        """Linien werden sortiert nach Distanz zu obenlinks."""
+        lines_sort = np.argsort(lines, axis=0)[...,0]
+        lines = lines[lines_sort[:,0]]
+        diff = np.diff(lines[:,0,0])
+        result = np.where(np.abs(np.diff(lines[:,0,0]))>100)[0]+1
+        return lines, result
 
+    @log
     def end_Punkt(self, lines):
         """durch np.linalg.solve rechnet die Schnittepunkten"""
-        result = np.where(np.abs(np.diff(lines[:,0,0]))>10)[0]+1
+        lines, result = self.linien_Sortieren(lines)
         gruppe_0 = lines[0:result[0]]
         gruppe_1 = lines[result[0]:result[1]]
         gruppe_2 = lines[result[1]:]
@@ -197,6 +241,7 @@ class DreiecksLokalisierung():
             xy_list.append(np.array([x[0],y[0]]))
         return xy_list
 
+    @log
     def get_6Punkten(self):
         """6 Punkten aus DreiecksMark"""
         print "6Punkten suchen"
@@ -232,6 +277,7 @@ class DreiecksLokalisierung():
             print "Punkten sind nicht ordnet"
         return sp_dict
 
+    @log
     def cam_zielen(self,kontours):
         """Kamera zu der Schwerpunk der Dreiecks aimen"""
         print "Zielen...."
@@ -251,17 +297,25 @@ class DreiecksLokalisierung():
         print "Zielen auf " , angles
         return None
 
+    @log
     def markFinden(self):
         """Suche Mark"""
         angles = [angle*(pi/180) for angle in range(-90, 120, 30)] # Scannen von -90 Grad zu 90 Grad
-        kontours = self.get_kontours_3()
+        kontours = self.get_kontours()
         if len(kontours) != 2:
             try:
-                for angle in angles:
+                angles_copy = angles[:]
+                for _ in angles:
+                    #Random Angle
+                    length = len(angles_copy)
+                    auswahl = np.random.randint(0,length)
+                    angle = angles_copy[auswahl]
+                    angles_copy.remove(angle)
+                    print angle
+                    #Kopf dreht zu gegebne angle
                     self.motion_service.setAngles("Head", [angle, 0.0], 0.5)
                     time.sleep(1)
-                    kontours = self.get_kontours_3()
-                    len_nr = len(kontours)
+                    kontours = self.get_kontours()
                     if len(kontours) != 2 and angle == angles[-1]:
                         raise RuntimeError
                     if len(kontours) != 2:
@@ -279,13 +333,23 @@ class DreiecksLokalisierung():
         self.cam_zielen(kontours)
         return None
 
+    @log
     def load_Par(self):
         """laden mtx, dist auf"""
         with np.load("Zusammen/Dreiecks_Lokalisierung/Datei/zusammen_oben_2000.npz") as file:
-            mtx, dist, _, _ = [file[i]
-                               for i in ("mtx", "dist", "rvecs", "tvecs")]
+            mtx, dist = [file[i]
+                               for i in ("mtx", "dist")]
         return mtx, dist
+    # @log
+    # def load_Par(self):
+    #     """laden mtx, dist auf"""
+    #     with np.load("Calibieren/choruBoard/oben_charu_2560.npz") as file:
+    #         mtx, dist = [file[i] for i in ("mtx", "dist")]
+    #         dist = None
+    #     return mtx, dist
 
+
+    @log
     def solve_PnP(self):
         """Lokaliserung rechen"""
         sp_dict = self.get_6Punkten()
@@ -311,7 +375,7 @@ class DreiecksLokalisierung():
         self.img = cv.line(self.img, corner, tuple(imgpts[1].ravel()), (0, 255, 0), 5)
         self.img = cv.line(self.img, corner, tuple(imgpts[2].ravel()), (0, 0, 255), 5)
         cv.imshow("Koordiante", cv.resize(self.img, (640,480)))
-        k = cv.waitKey(500)
+        k = cv.waitKey(0)
         cv.destroyAllWindows()
         try:
             if k == ord("n"):
@@ -322,6 +386,7 @@ class DreiecksLokalisierung():
             sys.exit(0)
         return rvecs_tr, tvecs_tr
 
+    @log
     def robot2Ziel(self):
         """Transform von Robot nach Ziel"""
         RotZ_1 = almath.Transform.fromRotZ(-pi/2)
@@ -344,6 +409,7 @@ class DreiecksLokalisierung():
         self.robot2zielROB = robot2zielOP * RotY_2 * RotX_2
         return self.robot2zielROB
 
+    @log
     def motion(self, Transform):
         """bewegen zu ziel. wenn das Distanz groesser als 30cm ist, wird der Robot nur 1/4 der Distanz in x richtung gehen."""
         print "gehen nach vorner"
@@ -375,6 +441,7 @@ class DreiecksLokalisierung():
             self.motion_fertig = True
         return None
 
+    @log
     def draw(self,sp_dict, kontours):
         for key, value in sp_dict.items():
             cv.circle(self.img, tuple((value[0])), 8, (0, 0, 255), -1)
@@ -383,10 +450,11 @@ class DreiecksLokalisierung():
             cv.drawContours(self.img, [contour], -1, (0, 0, 255), 5)
         # plt.subplot(), plt.imshow(self.img), plt.show()
         cv.imshow("6Punkten", cv.resize(self.img,(640,480)))
-        k = cv.waitKey(500)
+        k = cv.waitKey(0)
         cv.destroyAllWindows()
         return k
 
+    @log
     def kontours_filter(self,kontours):
         """testen contours, kleine contour wird abgeloest"""
         kontours_neu = []
@@ -398,6 +466,7 @@ class DreiecksLokalisierung():
                 kontours_neu.append(contour)
         return kontours_neu
 
+    @log
     def error(self):
         return self.motion_service.rest()
 
@@ -410,7 +479,7 @@ class DreiecksLokalisierung():
                     # 5 Mals versuchen, um Kontours zu finden.
                     result = self.video_cam.setResolution(self.subCamId, 4)        
                     print "Aufloesung auf '4' stellen.", result
-                    if len(self.get_kontours_3()) != 2:
+                    if len(self.get_kontours()) != 2:
                         self.markFinden()
                     else:
                         break
@@ -430,12 +499,14 @@ class DreiecksLokalisierung():
         return None
     
 if __name__ == "__main__":
-    # url = "tcp://10.0.158.231:9559"
-    url = "tcp://10.0.147.226:9559"
+    url = "tcp://192.168.1.101:8415"
+    # url = "tcp://10.0.147.226:9559"
     try:
         app = qi.Application(url=url)
     except RuntimeError:
         print"error!!"
         sys.exit(1)
     doSomething = DreiecksLokalisierung(app)
-    doSomething.run()
+    while True:
+        doSomething.kamBreit()
+        doSomething.markFinden()
