@@ -428,7 +428,9 @@ class DreiecksLokalisierung():
     
 if __name__ == "__main__":
     # url = "tcp://10.0.158.231:9559"
-    url = "tcp://10.0.147.226:9559"
+    url = "tcp://192.168.1.101:8415"
+
+    # url = "tcp://10.0.147.226:9559"
     try:
         app = qi.Application(url=url)
     except RuntimeError:
