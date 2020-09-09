@@ -22,7 +22,7 @@ img_hsv_raw = cv.cvtColor(blur_2, cv.COLOR_BGR2HSV)
 h,w,_ = img_raw.shape
 bit = np.ones((h,w,3))
 img = np.ones((h,w,3))
-cv.setTrackbarPos("Threshold", "image", 80)
+cv.setTrackbarPos("Threshold", "image", 120)
 
 
 # Greun
