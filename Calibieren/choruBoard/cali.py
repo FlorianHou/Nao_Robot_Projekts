@@ -15,11 +15,11 @@ img_files = glob.glob("/home/florian/Robot_Lokal/Calibieren/choruBoard/datei/*.p
 for path in img_files:
 
     #detktieren nur Markes
-    img = cv.imread(path)
-    img = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
+    img = cv.imread(path,0)
+    # img = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
     markcorners, markids, _ = aruco.detectMarkers(img, dictionary)
 
-    if markids is None or markids.size < 4:
+    if markids is None or markids.size <= 4:
         continue
 
     else:
@@ -27,13 +27,15 @@ for path in img_files:
         ret, charucoCorners, charucoIds = aruco.interpolateCornersCharuco(markcorners, markids, img, charou_board)
 
         imageCopy = aruco.drawDetectedCornersCharuco(img, charucoCorners, charucoIds, (255,0,0))
-        cv.imshow("", imageCopy)
+        cv.imshow("", cv.resize(imageCopy,(640,480)))
+        print path
         cv.waitKey(5)
         cv.destroyAllWindows()
         allchrucoCorners.append(charucoCorners)
         allchrucoIds.append(charucoIds)
 
 print len(allchrucoCorners)
+shape = img.shape[:2]
 ret, mtx, dist, rvecs, tvecs = aruco.calibrateCameraCharuco(allchrucoCorners, allchrucoIds,
                                         charou_board,img.shape[::-1], None, None)
 

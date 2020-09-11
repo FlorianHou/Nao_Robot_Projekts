@@ -7,10 +7,10 @@ import uuid
 import sys
 
 session = qi.Session()
-session.connect("tcp://192.168.1.101:8415")
+session.connect("tcp://10.0.147.226:9559")
 # 0 ist obere Kamera
 CamId = 0
-# # 3 ist k4VGA,2 ist VGA    plt.imshow(contours,"gray")
+# # 3 ist k4VGA,2 ist VGA
 Res = 4
 #BGR-13, YUV422-9
 ColorSpace = 0
