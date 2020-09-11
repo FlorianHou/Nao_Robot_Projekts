@@ -6,7 +6,7 @@ import csv
 
 
 session = qi.Session()
-session.connect("tcp://192.168.1.101:8415")
+session.connect("tcp://10.42.0.95:9559")
 # 0 ist obere Kamera
 CamId = 0
 # # 3 ist k4VGA,2 ist VGA    plt.imshow(contours,"gray")
@@ -40,9 +40,9 @@ for res in ResList:
     print nameId
 
     zeitList = []
-    for round in range(10):
+    for round in range(3):
 
-        for f in range(200):
+        for f in range(50):
             if f == 20:
                 t1 = time.time()
             contain = video_cam.getImageRemote(nameId)
@@ -54,15 +54,15 @@ for res in ResList:
         t2 = time.time()
         
         delta_t = t2-t1
-        print "round: ", round, "delta_t: ", delta_t, "Zeit Per Frame: ", delta_t/180.
+        print "round: ", round, "delta_t: ", delta_t, "Zeit Per Frame: ", delta_t/30.
         with open("SpeedTest_image/Yuv.csv", "a") as f:
             writer = csv.writer(f)
-            writer.writerow([res, round, delta_t, delta_t/180.])
+            writer.writerow([res, round, delta_t, delta_t/30.])
         zeitList.append(delta_t)        
-    print "durchschnittliche Zeit per frame:(10 round) ", sum(zeitList)/(float(len(zeitList))*180.)
+    print "durchschnittliche Zeit per frame:(3 round) ", sum(zeitList)/(float(len(zeitList))*30.)
     with open("SpeedTest_image/Yuv.csv", "a") as f:
         writer = csv.writer(f)
-        writer.writerow(["", "", "", "", "durchschnittliche Zeit per frame", sum(zeitList)/(float(len(zeitList))*180.)])
+        writer.writerow(["", "", "", "", "durchschnittliche Zeit per frame", sum(zeitList)/(float(len(zeitList))*30.)])
     # cv.destroyAllWindows()
     video_cam.unsubscribe(nameId)
 
