@@ -4,8 +4,8 @@ import math
 import time
 
 try:
-    # app = qi.Application(url="tcp://10.0.158.231:9559")
     app = qi.Application(url="tcp://10.0.147.226:9559")
+    # app = qi.Application(url="tcp://10.0.147.226:9559")
 except RuntimeError:
     print"error!!"
     sys.exit(1)
