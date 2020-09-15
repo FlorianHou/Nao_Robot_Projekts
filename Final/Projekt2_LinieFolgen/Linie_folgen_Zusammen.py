@@ -18,7 +18,7 @@ fps = 60
 
 try:
     # app = qi.Application(url="tcp://10.0.158.231:9559")
-    app = qi.Application(url="tcp://10.0.147.226:9559")    
+    app = qi.Application(url="tcp://10.42.0.95:9559")    
     app.start()
     session = app.session
     motion_service = session.service("ALMotion")

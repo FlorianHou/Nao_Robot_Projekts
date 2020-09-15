@@ -23,8 +23,8 @@ motion.rest()
 # autonomous_service.setState("disabled")
 
 
-pose.goToPosture("Stand", 0.5)
-motion.setAngles(["HeadPitch"], [10*(math.pi/180)], 0.1)
+# pose.goToPosture("Stand", 0.5)
+# motion.setAngles(["HeadPitch"], [10*(math.pi/180)], 0.1)
 
 
 time.sleep(2)

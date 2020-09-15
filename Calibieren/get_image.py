@@ -10,7 +10,7 @@ import sys
 # 0 ist obere Kamera
 CamId = 0
 # 3 ist k4VGA(1280*960),2 ist VGA(640), 1 ist 320*240, 0 ist 176*..
-Res = 3
+Res = 0
 #BGR-13(nicht RGB)
 ColorSpace = 13
 # FPS
@@ -64,6 +64,7 @@ while True:
     image_array_bgr = image_array #BGR
     # #Show Bild
     cv.imshow("img", cv.resize(image_array_bgr,(640,480)))
+    print image_array_bgr.shape
     k = cv.waitKey(5)
     # k = cv.waitKey(5) # Kontinuierliche Frame
     # # cv.destroyAllWindows()
