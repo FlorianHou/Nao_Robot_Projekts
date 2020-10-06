@@ -20,6 +20,8 @@ autonomous_service.setState("disabled")
 motion.rest()
 
 # pose.goToPosture("StandInit", 0.5)
+# motion.setStiffnesses("Head", 1.0)
+# motion.setAngles(["Head"], (0., (35 / 180) * math.pi), 0.02)
 # autonomous_service.setState("disabled")
 
 
